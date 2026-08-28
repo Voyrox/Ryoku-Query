@@ -34,7 +34,7 @@ for source-backed answers through Prowl.
 python3.12 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
-cp .env.example env
+cp .env.example .env
 ```
 
 ### 2. Clone the stable Ryoku repo
@@ -45,7 +45,7 @@ The bot uses a local stable Ryoku checkout for source-backed answers.
 git clone https://github.com/neur0map/ryoku-arch.git /path/to/ryoku
 ```
 
-Point `RYOKU_REPO_PATH` in `env` at that checkout.
+Point `RYOKU_REPO_PATH` in `.env` at that checkout.
 
 ### 3. Initialize the Ryoku checkout for Prowl
 
@@ -56,7 +56,7 @@ cd /path/to/ryoku
 prowl-agent init --no-input --integrations none
 ```
 
-### 4. Configure `env`
+### 4. Configure `.env`
 
 Set:
 
@@ -83,7 +83,7 @@ Nero retrieves the reviewed support card and/or Prowl citations **before** invok
 ```bash
 uv run --python 3.12 \
   --with-requirements requirements.txt \
-  --env-file env \
+  --env-file .env \
   python -B bot.py
 ```
 
@@ -111,6 +111,17 @@ uv run --python 3.12 \
   --ryoku-repo /path/to/ryoku \
   --check
 ```
+
+Run the local LLM benchmark when Ollama is available:
+
+```bash
+uv run --python 3.12 \
+  --with-requirements requirements.txt \
+  --env-file .env \
+  python -B benchmark_llm.py --check
+```
+
+The LLM benchmark uses `data/llm-evals.json` to exercise both routes: Gemma for a reviewed support answer and LFM for a source-cited answer. It records only final Discord-visible text, latency, pass/fail, model, and route metadata; hidden reasoning markers such as `<think>`, `thinking`, or `hidden-reasoning` cause a failure and are redacted from serialized output.
 
 ## Benchmark
 

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import sqlite3
+from contextlib import contextmanager
+from collections.abc import Iterator
 from pathlib import Path
 
 import discord
@@ -185,7 +187,12 @@ class FeedbackStore:
             for row in rows
         ]
 
-    def _connect(self) -> sqlite3.Connection:
+    @contextmanager
+    def _connect(self) -> Iterator[sqlite3.Connection]:
         connection = sqlite3.connect(self.path)
-        connection.execute("PRAGMA foreign_keys = ON")
-        return connection
+        try:
+            connection.execute("PRAGMA foreign_keys = ON")
+            with connection:
+                yield connection
+        finally:
+            connection.close()

@@ -84,25 +84,29 @@ class FeedbackStoreTests(unittest.TestCase):
     def test_migrates_existing_feedback_database_for_partially_correct(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "nero-feedback.sqlite3"
-            with sqlite3.connect(path) as connection:
-                connection.executescript(
-                    """
-                    CREATE TABLE answers (
-                        answer_message_id INTEGER PRIMARY KEY,
-                        request_message_id INTEGER NOT NULL,
-                        requester_id INTEGER NOT NULL
-                    );
-                    CREATE TABLE feedback (
-                        answer_message_id INTEGER NOT NULL,
-                        actor_id INTEGER NOT NULL,
-                        verdict TEXT NOT NULL CHECK (verdict IN ('correct', 'incorrect')),
-                        PRIMARY KEY (answer_message_id, actor_id),
-                        FOREIGN KEY (answer_message_id) REFERENCES answers(answer_message_id)
-                    );
-                    """
-                )
-                connection.execute("INSERT INTO answers VALUES (101, 100, 7)")
-                connection.execute("INSERT INTO feedback VALUES (101, 7, 'correct')")
+            connection = sqlite3.connect(path)
+            try:
+                with connection:
+                    connection.executescript(
+                        """
+                        CREATE TABLE answers (
+                            answer_message_id INTEGER PRIMARY KEY,
+                            request_message_id INTEGER NOT NULL,
+                            requester_id INTEGER NOT NULL
+                        );
+                        CREATE TABLE feedback (
+                            answer_message_id INTEGER NOT NULL,
+                            actor_id INTEGER NOT NULL,
+                            verdict TEXT NOT NULL CHECK (verdict IN ('correct', 'incorrect')),
+                            PRIMARY KEY (answer_message_id, actor_id),
+                            FOREIGN KEY (answer_message_id) REFERENCES answers(answer_message_id)
+                        );
+                        """
+                    )
+                    connection.execute("INSERT INTO answers VALUES (101, 100, 7)")
+                    connection.execute("INSERT INTO feedback VALUES (101, 7, 'correct')")
+            finally:
+                connection.close()
 
             store = FeedbackStore(path)
 

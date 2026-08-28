@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "cases": [
+    {
+      "id": "gemma-doctor-final",
+      "route": "gemma",
+      "question": "How do I check whether my Ryoku install is healthy?",
+      "evidence": {
+        "title": "Run Ryoku Doctor",
+        "answer": "Run `ryoku doctor` to inspect supported drift. It is the safe first check before changing system state.",
+        "risk": "informational",
+        "docs_url": "https://docs.ryoku.dev/docs/troubleshoot#self-heal-first-ryoku-doctor"
+      },
+      "sources": [],
+      "required_answer_fragments": [
+        "ryoku doctor"
+      ],
+      "forbidden_answer_fragments": [
+        "<think>",
+        "thinking",
+        "hidden-reasoning"
+      ]
+    },
+    {
+      "id": "lfm-cli-source-final",
+      "route": "lfm",
+      "question": "Where is the Ryoku CLI implemented?",
+      "evidence": {
+        "title": "Ryoku Repository Structure",
+        "answer": "The user-facing Ryoku CLI is implemented in the stable source tree under `ryoku/cli/`, with the main dispatcher in `ryoku/cli/main.go`.",
+        "risk": "informational",
+        "docs_url": "https://docs.ryoku.dev/docs/development"
+      },
+      "sources": [
+        {
+          "file": "ryoku/cli/main.go",
+          "start_line": 1,
+          "end_line": 33,
+          "snippet": "// ryoku = the user-facing CLI for the distro. one front door to updates, rollback, and the shell. It is a thin dispatcher."
+        }
+      ],
+      "required_answer_fragments": [
+        "ryoku/cli/main.go"
+      ],
+      "forbidden_answer_fragments": [
+        "<think>",
+        "thinking",
+        "hidden-reasoning"
+      ]
+    }
+  ]
+}
